@@ -13,10 +13,9 @@ class URLForm(FlaskForm):
         'Ваш вариант короткой ссылки',
         validators=[
             Optional(),
-            Length(max=Constants.MAX_CUSTOM_ID_LENGTH,
-                   message='Короткая ссылка не должна превышать 16 символов'),
             Regexp(
                 Constants.CUSTOM_ID_REGEX,
                 message='Короткая ссылка должна содержать '
-                'только латинские буквы и цифры')])
+                'только латинские буквы и цифры и не должна '
+                'превышать 16 символов')])
     submit = SubmitField('Создать')
