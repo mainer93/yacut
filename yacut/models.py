@@ -1,4 +1,5 @@
 import random
+import re
 
 from datetime import datetime
 
@@ -20,18 +21,28 @@ class URLMap(db.Model):
 
     @staticmethod
     def get_unique_short_id(length=Constants.MAX_LENGTH):
-        for _ in range(length):
-            return ''.join(random.choices(Constants.SYMBOLS, k=length))
+        return ''.join(random.choices(Constants.SYMBOLS, k=length))
+
+    def validate_url(self):
+        if not self.original:
+            raise InvalidAPIUsage('"url" является обязательным полем!')
+
+    def validate_custom_id(self):
+        if self.short:
+            if (
+                len(self.short) > Constants.MAX_CUSTOM_ID_LENGTH
+                or not re.match(Constants.CUSTOM_ID_REGEX, self.short)
+            ):
+                raise InvalidAPIUsage(
+                    'Указано недопустимое имя для короткой ссылки')
+            if URLMap.get(self.short):
+                raise InvalidAPIUsage(
+                    'Предложенный вариант короткой ссылки уже существует.')
 
     def save(self):
-        if not self.original:
-            raise InvalidAPIUsage('Оригинальная длинная ссылка '
-                                  'не может быть пустой.')
+        self.validate_url()
         if not self.short:
             self.short = self.get_unique_short_id()
-        elif URLMap.get(self.short):
-            raise InvalidAPIUsage(
-                f'Предложенный вариант короткой ссылки "{self.short}" '
-                f'уже существует.')
+        self.validate_custom_id()
         db.session.add(self)
         db.session.commit()

@@ -1,9 +1,10 @@
+from http import HTTPStatus
+
 from flask import flash, redirect, render_template, url_for
 
 from . import app
 from .forms import URLForm
 from .models import URLMap
-from .settings import Constants
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -27,7 +28,6 @@ def index_view():
 
 @app.route('/<short_id>')
 def redirect_to_url(short_id):
-    url_mapping = URLMap.get(short_id)
-    if url_mapping:
-        return redirect(url_mapping.original)
-    return render_template('404.html'), Constants.HTTP_STATUS_NOT_FOUND
+    if URLMap.get(short_id):
+        return redirect(URLMap.get(short_id).original)
+    return render_template('404.html'), HTTPStatus.NOT_FOUND
