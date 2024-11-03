@@ -4,7 +4,7 @@ import re
 from datetime import datetime
 
 from . import db
-from .error_handlers import InvalidAPIUsage
+from .error_handlers import CustomModelError
 from .settings import Constants
 
 
@@ -25,18 +25,15 @@ class URLMap(db.Model):
 
     def validate_url(self):
         if not self.original:
-            raise InvalidAPIUsage('"url" является обязательным полем!')
+            raise CustomModelError('"url" является обязательным полем!')
 
     def validate_custom_id(self):
         if self.short:
-            if (
-                len(self.short) > Constants.MAX_CUSTOM_ID_LENGTH
-                or not re.match(Constants.CUSTOM_ID_REGEX, self.short)
-            ):
-                raise InvalidAPIUsage(
+            if not re.match(Constants.CUSTOM_ID_REGEX, self.short):
+                raise CustomModelError(
                     'Указано недопустимое имя для короткой ссылки')
             if URLMap.get(self.short):
-                raise InvalidAPIUsage(
+                raise CustomModelError(
                     'Предложенный вариант короткой ссылки уже существует.')
 
     def save(self):

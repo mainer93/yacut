@@ -12,13 +12,11 @@ def add_url():
     data = request.get_json(silent=True)
     if data is None:
         raise InvalidAPIUsage('Отсутствует тело запроса')
-    original_url = data.get('url')
-    custom_id = data.get('custom_id')
-    new_url = URLMap(original=original_url, short=custom_id)
+    new_url = URLMap(original=data.get('url'), short=data.get('custom_id'))
     new_url.save()
     short_link = url_for('redirect_to_url', short_id=new_url.short,
                          _external=True)
-    return (jsonify({'url': original_url, 'short_link': short_link}),
+    return (jsonify({'url': data.get('url'), 'short_link': short_link}),
             HTTPStatus.CREATED)
 
 
