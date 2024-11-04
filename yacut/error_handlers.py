@@ -39,8 +39,3 @@ def internal_error(error):
     db.session.rollback()
     return (render_template('500.html'),
             HTTPStatus.INTERNAL_SERVER_ERROR)
-
-
-@app.errorhandler(CustomModelError)
-def handle_model_validation_error(error):
-    return jsonify({'message': str(error)}), HTTPStatus.BAD_REQUEST

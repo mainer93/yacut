@@ -17,7 +17,7 @@ def index_view():
         try:
             url_map.save()
         except CustomModelError as e:
-            flash(e.message)
+            flash(str(e))
             return render_template('index.html', form=form)
         short_url = url_for('redirect_to_url', short_id=url_map.short,
                             _external=True)
